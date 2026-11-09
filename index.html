@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Biliardo VIII-Ball — Stile Neoclassico</title>
+  
+  <!-- Font Neoclassici (Cinzel & Cormorant Garamond con fallback serif di pregio) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #070b10;
+      --bg-marble: #0d131a;
+      --gold-primary: #d4af37;
+      --gold-light: #f6e3a1;
+      --gold-dim: #997a38;
+      --gold-bronze: #785a24;
+      --gold-glow: rgba(212, 175, 55, 0.45);
+      --cloth-green: #115732;
+      --cloth-deep: #0a3a21;
+      --wood-mahogany: #331508;
+      --wood-burl: #210c04;
+      --cream-ivory: #fdfbf7;
+      --text-dim: #c5bca9;
+      --red-royal: #b91c1c;
+      --blue-royal: #1e3a8a;
+      --font-serif-title: 'Cinzel', 'Playfair Display', 'Baskerville', 'Georgia', serif;
+      --font-serif-body: 'Cormorant Garamond', 'Times New Roman', 'Georgia', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: radial-gradient(ellipse at 50% 35%, #182332 0%, #0c141d 55%, #05080c 100%);
+      color: var(--cream-ivory);
+      font-family: var(--font-serif-body);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Filigrana di fondo neoclassica molto sottile */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 70%),
+        repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.008) 0px, rgba(212, 175, 55, 0.008) 2px, transparent 2px, transparent 24px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* =========================================================================
+       TOP HEADER & SCHEDE GIOCATORE NEOCLASSICHE
+       ========================================================================= */
+    header {
+      width: 100%;
+      max-width: 1260px;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .player-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(145deg, rgba(16, 23, 33, 0.95) 0%, rgba(8, 12, 18, 0.98) 100%);
+      border: 1px solid var(--gold-bronze);
+      box-shadow: 
+        0 0 0 1px rgba(212, 175, 55, 0.15) inset,
+        0 8px 24px rgba(0, 0, 0, 0.65);
+      border-radius: 4px;
+      padding: 8px 18px 8px 8px;
+      min-width: 310px;
+      position: relative;
+      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Angoli dorati decorativi neoclassici (filetto geometrico) */
+    .player-card::before {
+      content: '❖';
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      font-size: 10px;
+      color: var(--gold-primary);
+      text-shadow: 0 0 6px var(--gold-glow);
+    }
+
+    .player-card.player-2 {
+      flex-direction: row-reverse;
+      padding: 8px 8px 8px 18px;
+    }
+
+    .player-card.player-2::before {
+      left: auto;
+      right: -6px;
+    }
+
+    .player-card.active {
+      border-color: var(--gold-primary);
+      box-shadow: 
+        0 0 0 1px var(--gold-light) inset,
+        0 0 24px var(--gold-glow),
+        0 10px 30px rgba(0, 0, 0, 0.8);
+      transform: translateY(-2px);
+    }
+
+    /* Cartiglio "AL TIRO" */
+    .player-card.active::after {
+      content: '⚜ IN TVRNO ⚜';
+      position: absolute;
+      bottom: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #dfc062 0%, #a78229 100%);
+      color: #170d02;
+      font-family: var(--font-serif-title);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 3px 12px;
+      border-radius: 2px;
+      border: 1px solid #fff0b3;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      animation: pulse-turn 2s infinite ease-in-out;
+      white-space: nowrap;
+    }
+
+    @keyframes pulse-turn {
+      0%, 100% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+      50% { transform: translateX(-50%) scale(1.05); filter: brightness(1.2); }
+    }
+
+    .player-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      background: radial-gradient(circle, #253346 0%, #121a24 100%);
+      border: 2px solid var(--gold-dim);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .player-card.active .player-avatar {
+      border-color: var(--gold-primary);
+      box-shadow: 
+        inset 0 0 12px rgba(212, 175, 55, 0.35),
+        0 0 10px var(--gold-glow);
+    }
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+
+    .player-card.player-2 .player-info {
+      text-align: right;
+    }
+
+    .player-name {
+      font-family: var(--font-serif-title);
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff9ee;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .player-badge {
+      font-size: 13px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-style: italic;
+    }
+
+    .player-card.player-2 .player-badge {
+      justify-content: flex-end;
+    }
+
+    .badge-tag {
+      font-family: var(--font-serif-title);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 2px;
+      background: #1c2635;
+      color: var(--gold-light);
+      border: 1px solid var(--gold-bronze);
+      letter-spacing: 1px;
+    }
+
+    .badge-tag.solids {
+      background: linear-gradient(180deg, #92400e 0%, #5a2503 100%);
+      color: #fef3c7;
+      border: 1px solid #f59e0b;
+    }
+
+    .badge-tag.stripes {
+      background: linear-gradient(180deg, #1e40af 0%, #0f205b 100%);
+      color: #dbeafe;
+      border: 1px solid #60a5fa;
+    }
+
+    .ball-rack-status {
+      display: flex;
+      gap: 5px;
+      margin-top: 4px;
+      align-items: center;
+    }
+
+    .player-card.player-2 .ball-rack-status {
+      justify-content: flex-end;
+    }
+
+    /* Miniature bilie a cammeo prezioso incastonato */
+    .mini-ball {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #334155;
+      display: inline-block;
+      transition: all 0.3s;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      box-shadow: inset 0 -2px 3px rgba(0,0,0,0.6), 0 2px 5px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    .mini-ball.active {
+      transform: scale(1.08);
+      border-color: var(--gold-primary);
+    }
+
+    .mini-ball.pocketed {
+      opacity: 0.18;
+      filter: grayscale(100%);
+      transform: scale(0.85);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .mini-ball.target-8 {
+      background: #000 !important;
+      border: 1.5px solid var(--gold-light) !important;
+      animation: pulse-eight 1.4s infinite alternate;
+    }
+
+    @keyframes pulse-eight {
+      0% { transform: scale(1.05); box-shadow: 0 0 5px var(--gold-primary); }
+      100% { transform: scale(1.3); box-shadow: 0 0 16px var(--gold-light); }
+    }
+
+    /* MEDAGLIONE CENTRALE "VERSVS" */
+    .match-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .vs-frame {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .vs-flourish {
+      color: var(--gold-dim);
+      font-size: 14px;
+    }
+
+    .vs-logo {
+      font-family: var(--font-serif-title);
+      font-weight: 900;
+      font-size: 19px;
+      background: linear-gradient(180deg, #fff3c4 0%, #dfb74a 45%, #926d1d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
+      letter-spacing: 4px;
+    }
+
+    .mode-badge {
+      font-family: var(--font-serif-title);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: rgba(18, 26, 38, 0.8);
+      padding: 3px 12px;
+      border-radius: 2px;
+      border: 1px solid var(--gold-bronze);
+      color: var(--gold-light);
+    }
+
+    /* =========================================================================
+       AREA DI GIOCO CENTRALE
+       ========================================================================= */
+    .game-area {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0 15px;
+    }
+
+    .table-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: 
+        0 30px 80px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(212, 175, 55, 0.3),
+        0 0 60px rgba(0, 0, 0, 0.6);
+      border-radius: 12px;
+    }
+
+    canvas#poolCanvas {
+      display: block;
+      border-radius: 12px;
+      cursor: crosshair;
+    }
+
+    /* =========================================================================
+       BARRA DI POTENZA — STILE COLONNA E MANOMETRO NEOCLASSICO
+       ========================================================================= */
+    .power-container {
+      position: absolute;
+      right: -76px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 440px;
+      width: 56px;
+      background: linear-gradient(180deg, #1b2636 0%, #0c131d 50%, #070c12 100%);
+      border: 1px solid var(--gold-primary);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 6px;
+      box-shadow: 
+        0 0 0 1px rgba(212, 175, 55, 0.2) inset,
+        0 15px 35px rgba(0,0,0,0.85);
+      user-select: none;
+      touch-action: none;
+    }
+
+    /* Capitello superiore ornamentale */
+    .power-container::before {
+      content: '⚜';
+      font-size: 14px;
+      color: var(--gold-primary);
+      margin-bottom: 2px;
+      text-shadow: 0 0 6px var(--gold-glow);
+    }
+
+    .power-label {
+      font-family: var(--font-serif-title);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      writing-mode: vertical-lr;
+      transform: rotate(180deg);
+      margin: 6px 0;
+    }
+
+    .power-track {
+      flex: 1;
+      width: 14px;
+      background: #06090e;
+      border-radius: 3px;
+      margin: 8px 0;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--gold-bronze);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.9);
+      cursor: ns-resize;
+    }
+
+    .power-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background: linear-gradient(0deg, #15803d 0%, #d97706 50%, #dc2626 100%);
+      border-radius: 2px;
+      transition: height 0.04s ease-out;
+      box-shadow: 0 0 12px rgba(220, 38, 38, 0.7);
+    }
+
+    /* Cursore in ottone cesellato */
+    .power-handle {
+      position: absolute;
+      bottom: 0%;
+      left: 50%;
+      transform: translate(-50%, 50%);
+      width: 38px;
+      height: 22px;
+      background: linear-gradient(180deg, #fff2cc 0%, #d4af37 60%, #87621c 100%);
+      border: 1px solid #fff;
+      border-radius: 3px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 6px var(--gold-glow);
+      cursor: grab;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .power-handle:active {
+      cursor: grabbing;
+      box-shadow: 0 0 14px var(--gold-primary);
+    }
+
+    .power-handle::after {
+      content: '≡';
+      font-size: 14px;
+      font-weight: bold;
+      color: #3b2707;
+      line-height: 1;
+    }
+
+    .power-pct {
+      font-family: var(--font-serif-title);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold-light);
+      font-variant-numeric: tabular-nums;
+      margin-top: 4px;
+    }
+
+    /* =========================================================================
+       NOTIFICA A EDITTO / PROCLAMA IMPERIALE
+       ========================================================================= */
+    .toast-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      background: linear-gradient(145deg, rgba(14, 20, 30, 0.98) 0%, rgba(6, 10, 15, 0.99) 100%);
+      border: 1px solid var(--gold-primary);
+      border-radius: 4px;
+      padding: 22px 48px;
+      text-align: center;
+      box-shadow: 
+        0 0 0 1px rgba(212, 175, 55, 0.25) inset,
+        0 30px 70px rgba(0,0,0,0.9),
+        0 0 50px var(--gold-glow);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .toast-overlay.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .toast-title {
+      font-family: var(--font-serif-title);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #fff3c4 0%, #dfb74a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .toast-desc {
+      font-size: 15px;
+      color: var(--cream-ivory);
+      font-style: italic;
+      max-width: 440px;
+      line-height: 1.5;
+    }
+
+    /* =========================================================================
+       BARRA STRUMENTI INFERIORE NEOCLASSICA
+       ========================================================================= */
+    footer {
+      width: 100%;
+      max-width: 1260px;
+      padding: 8px 24px 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    button.ui-btn {
+      background: linear-gradient(180deg, #1c2738 0%, #0d1520 100%);
+      border: 1px solid var(--gold-bronze);
+      color: var(--cream-ivory);
+      font-family: var(--font-serif-title);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 9px 18px;
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    button.ui-btn:hover {
+      background: linear-gradient(180deg, #27364d 0%, #131e2d 100%);
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 14px var(--gold-glow);
+      transform: translateY(-1px);
+      color: #fff;
+    }
+
+    button.ui-btn:active {
+      transform: translateY(1px);
+    }
+
+    button.ui-btn.primary {
+      background: linear-gradient(180deg, #e4c158 0%, #aa8529 100%);
+      border-color: #ffe89e;
+      color: #170e03;
+      font-weight: 900;
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+    }
+
+    button.ui-btn.primary:hover {
+      background: linear-gradient(180deg, #f7d97b 0%, #be9732 100%);
+      box-shadow: 0 0 18px var(--gold-glow);
+    }
+
+    .hints-info {
+      font-size: 13px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-style: italic;
+    }
+
+    .key-tag {
+      background: #111a24;
+      border: 1px solid var(--gold-bronze);
+      color: var(--gold-light);
+      padding: 1px 7px;
+      border-radius: 2px;
+      font-family: var(--font-serif-title);
+      font-size: 10px;
+      font-style: normal;
+    }
+
+    /* =========================================================================
+       MODALI REGOLE E FINE PARTITA
+       ========================================================================= */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 5, 8, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: linear-gradient(160deg, #131c28 0%, #090f17 100%);
+      border: 1px solid var(--gold-primary);
+      box-shadow: 
+        0 0 0 1px rgba(212, 175, 55, 0.25) inset,
+        0 30px 80px rgba(0,0,0,0.95),
+        0 0 50px var(--gold-glow);
+      border-radius: 6px;
+      width: 90%;
+      max-width: 560px;
+      padding: 30px;
+      position: relative;
+    }
+
+    .modal-box::before {
+      content: '⚜';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #131c28;
+      padding: 0 10px;
+      color: var(--gold-primary);
+      font-size: 18px;
+    }
+
+    .modal-box h2 {
+      font-family: var(--font-serif-title);
+      font-size: 22px;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .modal-divider {
+      text-align: center;
+      color: var(--gold-dim);
+      margin-bottom: 16px;
+      font-size: 14px;
+      letter-spacing: 6px;
+    }
+
+    .modal-box p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--cream-ivory);
+      margin-bottom: 12px;
+    }
+
+    .modal-box ul {
+      padding-left: 22px;
+      margin-bottom: 20px;
+      color: var(--cream-ivory);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1180px) {
+      .power-container {
+        right: 8px;
+        height: 330px;
+        opacity: 0.92;
+      }
+    }
+    @media (max-width: 860px) {
+      header {
+        padding: 6px 12px;
+      }
+      .player-card {
+        min-width: 175px;
+        padding: 4px 8px;
+      }
+      .player-avatar {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+      }
+      .hints-info {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER CON INFO GIOCATORI E STATO TURNI -->
+  <header>
+    <div class="player-card active" id="cardP1">
+      <div class="player-avatar">🏛️</div>
+      <div class="player-info">
+        <div class="player-name" id="nameP1">Giocatore I</div>
+        <div class="player-badge">
+          Gruppo: <span class="badge-tag" id="groupP1">Tavolo Aperto</span>
+        </div>
+        <div class="ball-rack-status" id="rackP1"></div>
+      </div>
+    </div>
+
+    <div class="match-center">
+      <div class="vs-frame">
+        <span class="vs-flourish">❧</span>
+        <div class="vs-logo">VERSVS</div>
+        <span class="vs-flourish">☙</span>
+      </div>
+      <div class="mode-badge" id="modeBadge">Dvo Giocatori · Locale</div>
+    </div>
+
+    <div class="player-card player-2" id="cardP2">
+      <div class="player-avatar">⚜️</div>
+      <div class="player-info">
+        <div class="player-name" id="nameP2">Giocatore II</div>
+        <div class="player-badge">
+          Gruppo: <span class="badge-tag" id="groupP2">Tavolo Aperto</span>
+        </div>
+        <div class="ball-rack-status" id="rackP2"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- AREA DI GIOCO CENTRALE -->
+  <div class="game-area">
+    <div class="table-container">
+      <canvas id="poolCanvas"></canvas>
+
+      <!-- BARRA DI POTENZA A COLONNA CLASSICA -->
+      <div class="power-container" id="powerContainer">
+        <div class="power-label">Forza del Tiro</div>
+        <div class="power-track" id="powerTrack">
+          <div class="power-fill" id="powerFill"></div>
+          <div class="power-handle" id="powerHandle"></div>
+        </div>
+        <div class="power-pct" id="powerPct">0%</div>
+      </div>
+
+      <!-- NOTIFICA A EDITTO IMPERIALE -->
+      <div class="toast-overlay" id="toastOverlay">
+        <div class="toast-title" id="toastTitle">Fallo!</div>
+        <div class="toast-desc" id="toastDesc">Palla in mano per l'avversario</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA CONTROLLI IN BASSO -->
+  <footer>
+    <div class="btn-group">
+      <button class="ui-btn primary" id="btnRestart">⟳ Nuova Partita</button>
+      <button class="ui-btn" id="btnMode">👥 Modalità: Dvo Giocatori</button>
+      <button class="ui-btn" id="btnSound">🔊 Audio: Attivo</button>
+      <button class="ui-btn" id="btnRules">📜 Regolamento VIII-Ball</button>
+    </div>
+
+    <div class="hints-info">
+      <span><span class="key-tag">Cursore</span> Mira 360°</span>
+      <span><span class="key-tag">Barra / ↑↓</span> Forza</span>
+      <span><span class="key-tag">←→</span> Regolazione Fine</span>
+      <span><span class="key-tag">Spazio</span> Scocca Tiro</span>
+    </div>
+  </footer>
+
+  <!-- MODALE REGOLE -->
+  <div class="modal-backdrop" id="rulesModal">
+    <div class="modal-box">
+      <h2>Regolamento Ufficiale VIII-Ball</h2>
+      <div class="modal-divider">— ❧ ⚜ ☙ —</div>
+      <p>L'obiettivo è imbucare secondo le regole dell'arte tutte le 7 bilie del proprio gruppo (Piene o Rigate) e infine la nobile palla Nera (VIII-Ball).</p>
+      <ul>
+        <li><strong>Spaccata (Break):</strong> La palla bianca deve partire dietro la linea di spaccata (Kitchen). Trascinala prima del tiro per posizionarla liberamente nell'area di testa.</li>
+        <li><strong>Tavolo Aperto:</strong> All'inizio nessun gruppo è assegnato. L'assegnazione avviene alla prima palla imbucata con un tiro regolare.</li>
+        <li><strong>Tiro Legale:</strong> La bianca deve impattare per prima una bilia del proprio gruppo; successivamente almeno una palla deve toccare una sponda o cadere in buca.</li>
+        <li><strong>Fallo (Palla in Mano):</strong> Se imbuchi la bianca, manchi il tocco, o colpisci per prima una palla errata/la palla 8, l'avversario ottiene la <em>Palla in Mano</em> e può posizionarla liberamente ovunque sul panno!</li>
+        <li><strong>Vittoria:</strong> Imbuca regolarmente la palla 8 dopo aver ripulito tutte le 7 bilie del tuo gruppo.</li>
+        <li><strong>Sconfitta Immediata:</strong> Imbucare la palla 8 anzitempo, oppure imbucare la palla 8 commettendo contemporaneamente un fallo (es. la bianca cade anch'essa in buca).</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="ui-btn primary" id="btnCloseRules">⚜ Entra nella Contesa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE FINE PARTITA -->
+  <div class="modal-backdrop" id="gameOverModal">
+    <div class="modal-box" style="text-align: center;">
+      <h2 id="winnerTitle" style="font-size: 26px;">🏆 Trionfo Imperiale</h2>
+      <div class="modal-divider">— ❧ ⚜ ☙ —</div>
+      <p id="winnerReason" style="font-size: 16px; margin: 16px 0; font-style: italic;">Il Giocatore I trionfa nella contesa!</p>
+      <div class="modal-actions">
+        <button class="ui-btn primary" id="btnPlayAgain" style="padding: 10px 28px; font-size: 13px;">⟳ Nuova Sfida</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * =========================================================================
+     * BILIARDO VIII-BALL — STILE NEOCLASSICO
+     * =========================================================================
+     * - Estetica Neoclassica: legno di radica, doppi filetti dorati (inlay),
+     *   placche delle buche in bronzo cesellato, diamanti in avorio/oro.
+     * - Fisica avanzata 2D con sub-stepping, urti elastici conservativi,
+     *   attrito dinamico di rotolamento e rimbalzi realistici su sponde poligonali.
+     * - Sistema di mira con proiezioni e calcolo dei vettori di deviazione
+     *   (ghost ball, traiettoria palla bersaglio, rimbalzo su sponda e deviazione bianca).
+     * - Meccanica di tiro stile Miniclip con barra laterale, trascinamento stecca e regolazione fine.
+     * - Regolamento BCA / Miniclip 8-Ball completo con falli e palla in mano.
+     * - Sintetizzatore audio procedurale Web Audio API (zero file esterni).
+     */
+
+    // --- SINTETIZZATORE AUDIO WEB AUDIO API ---
+    class SoundFX {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playCueHit(power = 1) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140 + power * 120, t);
+        osc.frequency.exponentialRampToValueAtTime(30, t + 0.08);
+
+        gain.gain.setValueAtTime(0.55 * Math.min(1, Math.max(0.2, power)), t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.09);
+      }
+
+      playBallHit(velocity = 500) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const speedFactor = Math.min(1, Math.max(0.12, velocity / 1200));
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1800 + Math.random() * 300, t);
+        osc.frequency.exponentialRampToValueAtTime(400, t + 0.035);
+
+        gain.gain.setValueAtTime(0.6 * speedFactor, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.04);
+
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.025);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.35 * speedFactor, t);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+
+        noise.connect(noiseGain);
+        noiseGain.connect(this.ctx.destination);
+        noise.start(t);
+      }
+
+      playCushionHit(velocity = 300) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const speedFactor = Math.min(1, Math.max(0.15, velocity / 900));
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(130, t);
+        osc.frequency.exponentialRampToValueAtTime(50, t + 0.06);
+
+        gain.gain.setValueAtTime(0.4 * speedFactor, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.07);
+      }
+
+      playPocketSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(260, t);
+        osc.frequency.exponentialRampToValueAtTime(70, t + 0.18);
+
+        gain.gain.setValueAtTime(0.6, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.21);
+      }
+
+      playFoulSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        [0, 0.12].forEach((offset, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(idx === 0 ? 220 : 175, t + offset);
+          gain.gain.setValueAtTime(0.2, t + offset);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + offset + 0.1);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t + offset);
+          osc.stop(t + offset + 0.11);
+        });
+      }
+
+      playWinSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const notes = [261.63, 329.63, 392.00, 523.25];
+        const t = this.ctx.currentTime;
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t + idx * 0.12);
+          gain.gain.setValueAtTime(0.32, t + idx * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.12 + 0.38);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t + idx * 0.12);
+          osc.stop(t + idx * 0.12 + 0.39);
+        });
+      }
+    }
+
+    const sound = new SoundFX();
+
+    // --- COLORI E DATI UFFICIALI DELLE 16 PALLE ---
+    const BALL_COLORS = {
+      0:  { bg: '#ffffff', numColor: '#000000', name: 'Cue' },
+      1:  { bg: '#f59e0b', numColor: '#000000', name: '1 Gialla' },
+      2:  { bg: '#2563eb', numColor: '#ffffff', name: '2 Blu' },
+      3:  { bg: '#dc2626', numColor: '#ffffff', name: '3 Rossa' },
+      4:  { bg: '#7c3aed', numColor: '#ffffff', name: '4 Viola' },
+      5:  { bg: '#ea580c', numColor: '#ffffff', name: '5 Arancio' },
+      6:  { bg: '#16a34a', numColor: '#ffffff', name: '6 Verde' },
+      7:  { bg: '#7f1d1d', numColor: '#ffffff', name: '7 Granata' },
+      8:  { bg: '#111827', numColor: '#ffffff', name: '8 Nera' },
+      9:  { bg: '#f59e0b', numColor: '#000000', name: '9 Gialla R' },
+      10: { bg: '#2563eb', numColor: '#ffffff', name: '10 Blu R' },
+      11: { bg: '#dc2626', numColor: '#ffffff', name: '11 Rossa R' },
+      12: { bg: '#7c3aed', numColor: '#ffffff', name: '12 Viola R' },
+      13: { bg: '#ea580c', numColor: '#ffffff', name: '13 Arancio R' },
+      14: { bg: '#16a34a', numColor: '#ffffff', name: '14 Verde R' },
+      15: { bg: '#7f1d1d', numColor: '#ffffff', name: '15 Granata R' }
+    };
+
+    // --- CLASSE QUATERNIONE PER LA ROTAZIONE 3D DELLE BILIE ---
+    class Quat {
+      constructor(w = 1, x = 0, y = 0, z = 0) {
+        this.w = w; this.x = x; this.y = y; this.z = z;
+      }
+
+      rotateVector(vx, vy, vz) {
+        const qx = this.x, qy = this.y, qz = this.z, qw = this.w;
+        const ix = qw * vx + qy * vz - qz * vy;
+        const iy = qw * vy + qz * vx - qx * vz;
+        const iz = qw * vz + qx * vy - qy * vx;
+        const iw = -qx * vx - qy * vy - qz * vz;
+        return {
+          x: ix * qw + iw * -qx + iy * -qz - iz * -qy,
+          y: iy * qw + iw * -qy + iz * -qx - ix * -qz,
+          z: iz * qw + iw * -qz + ix * -qy - iy * -qx
+        };
+      }
+
+      rotateByAxisAngle(ax, ay, az, angle) {
+        const half = angle * 0.5;
+        const s = Math.sin(half);
+        const c = Math.cos(half);
+        const rw = c, rx = ax * s, ry = ay * s, rz = az * s;
+        const nw = rw * this.w - rx * this.x - ry * this.y - rz * this.z;
+        const nx = rw * this.x + rx * this.w + ry * this.z - rz * this.y;
+        const ny = rw * this.y - rx * this.z + ry * this.w + rz * this.x;
+        const nz = rw * this.z + rx * this.y - ry * this.x + rz * this.w;
+        const len = Math.hypot(nw, nx, ny, nz);
+        if (len > 0) {
+          this.w = nw / len; this.x = nx / len; this.y = ny / len; this.z = nz / len;
+        }
+      }
+    }
+
+    // --- CLASSE BILIA CON FISICA 2D E ROTOLAMENTO SFERICO 3D ---
+    class Ball {
+      constructor(number, x, y, radius = 13.5) {
+        this.number = number;
+        this.x = x;
+        this.y = y;
+        this.vx = 0;
+        this.vy = 0;
+        this.radius = radius;
+        this.mass = 1;
+        this.isPocketed = false;
+        this.isPocketing = false;
+        this.pocketAnimProgress = 0;
+        this.targetPocket = null;
+        this.visible = true;
+
+        this.isCue = (number === 0);
+        this.isEight = (number === 8);
+        this.isSolid = (number >= 1 && number <= 7);
+        this.isStripe = (number >= 9 && number <= 15);
+
+        // Orientamento 3D sferico (quaternione)
+        this.quat = new Quat();
+        // Inizializza con orientamento frontale/leggermente inclinato realistico
+        if (!this.isCue) {
+          const tilt = (number * 0.35) % 0.4 - 0.2;
+          this.quat.rotateByAxisAngle(0, 1, 0, tilt);
+        }
+      }
+
+      get speed() {
+        return Math.hypot(this.vx, this.vy);
+      }
+
+      update(dt) {
+        if (this.isPocketed) return;
+
+        if (this.isPocketing) {
+          this.pocketAnimProgress += dt * 5.0;
+          if (this.targetPocket) {
+            this.x += (this.targetPocket.x - this.x) * 0.2;
+            this.y += (this.targetPocket.y - this.y) * 0.2;
+          }
+          if (this.pocketAnimProgress >= 1) {
+            this.isPocketed = true;
+            this.isPocketing = false;
+            this.vx = 0;
+            this.vy = 0;
+          }
+          return;
+        }
+
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+
+        const spd = this.speed;
+        if (spd > 0) {
+          // Rotolamento senza strisciamento 3D (No-slip rolling)
+          // L'angolo di rotazione è proporzionale alla distanza percorsa: dTheta = (spd * dt) / R
+          const angle = (spd / this.radius) * dt;
+          // Asse di rotazione ortogonale alla direzione del moto sul piano del tavolo
+          const ax = -this.vy / spd;
+          const ay = this.vx / spd;
+          this.quat.rotateByAxisAngle(ax, ay, 0, angle);
+
+          // Decelerazione per attrito del panno
+          const rollingFriction = 130;
+          const drop = rollingFriction * dt;
+          if (spd <= drop || spd < 1.8) {
+            this.vx = 0;
+            this.vy = 0;
+          } else {
+            const factor = (spd - drop) / spd;
+            this.vx *= factor;
+            this.vy *= factor;
+          }
+        }
+      }
+
+      draw(ctx) {
+        if (!this.visible || this.isPocketed) return;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        let scale = 1;
+        if (this.isPocketing) {
+          scale = Math.max(0.1, 1 - this.pocketAnimProgress * 0.65);
+          ctx.globalAlpha = Math.max(0, 1 - this.pocketAnimProgress);
+        }
+        ctx.scale(scale, scale);
+
+        // 1. Ombra della bilia sul panno (statica rispetto alla luce dall'alto)
+        ctx.beginPath();
+        ctx.ellipse(3, 4, this.radius, this.radius * 0.85, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fill();
+
+        const r = this.radius;
+        const colInfo = BALL_COLORS[this.number] || { bg: '#ffffff', numColor: '#000' };
+
+        // 2. Maschera sferica (clip alla circonferenza della bilia)
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.clip();
+
+        // 3. Rendering delle texture di superficie 3D rotanti
+        if (this.isCue) {
+          // Bilia Bianca (Aramith Pro-Cup con 6 punti rossi d'orientamento 3D)
+          ctx.fillStyle = '#f8f6f0';
+          ctx.fillRect(-r, -r, r * 2, r * 2);
+
+          // 6 punti cardinali rossi
+          const dotAxes = [
+            { x: 0, y: 0, z: 1 }, { x: 0, y: 0, z: -1 },
+            { x: 1, y: 0, z: 0 }, { x: -1, y: 0, z: 0 },
+            { x: 0, y: 1, z: 0 }, { x: 0, y: -1, z: 0 }
+          ];
+
+          dotAxes.forEach(ax => {
+            const v = this.quat.rotateVector(ax.x, ax.y, ax.z);
+            if (v.z > -0.05) {
+              const dotR = 2.0 * Math.max(0.35, v.z);
+              ctx.beginPath();
+              ctx.arc(v.x * r, v.y * r, dotR, 0, Math.PI * 2);
+              ctx.fillStyle = '#dc2626';
+              ctx.fill();
+            }
+          });
+
+        } else if (this.isSolid || this.isEight) {
+          // Bilie Piene (1-7) e Palla 8
+          ctx.fillStyle = colInfo.bg;
+          ctx.fillRect(-r, -r, r * 2, r * 2);
+
+          // Due cerchi con numero su poli opposti
+          const n1 = this.quat.rotateVector(0, 0, 1);
+          const u1 = this.quat.rotateVector(0, -1, 0);
+          const n2 = { x: -n1.x, y: -n1.y, z: -n1.z };
+          const u2 = u1;
+
+          this.drawSpot(ctx, n1, u1, this.number, r);
+          this.drawSpot(ctx, n2, u2, this.number, r);
+
+        } else if (this.isStripe) {
+          // Bilie Rigate (9-15)
+          // Base bianca
+          ctx.fillStyle = '#fbf9f4';
+          ctx.fillRect(-r, -r, r * 2, r * 2);
+
+          // Fascia colorata equatoriale che ruota in 3D
+          this.draw3DStripe(ctx, colInfo.bg, r);
+
+          // Due numeri centrati nella fascia su poli opposti dell'equatore
+          const n1 = this.quat.rotateVector(0, 0, 1);
+          const u1 = this.quat.rotateVector(0, -1, 0);
+          const n2 = { x: -n1.x, y: -n1.y, z: -n1.z };
+          const u2 = u1;
+
+          this.drawSpot(ctx, n1, u1, this.number, r);
+          this.drawSpot(ctx, n2, u2, this.number, r);
+        }
+
+        // 4. Ombreggiatura e Luce Speculare 3D Fissa (Luce del lampadario dall'alto)
+        // Crea l'illusione di una vera sfera tridimensionale su cui la superficie ruota
+        const sphereShadow = ctx.createRadialGradient(-r * 0.25, -r * 0.25, r * 0.15, 0, 0, r);
+        sphereShadow.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+        sphereShadow.addColorStop(0.65, 'rgba(0, 0, 0, 0)');
+        sphereShadow.addColorStop(1, 'rgba(0, 0, 0, 0.48)');
+        ctx.fillStyle = sphereShadow;
+        ctx.fillRect(-r, -r, r * 2, r * 2);
+
+        // Riflesso lucido speculare
+        const shine = ctx.createRadialGradient(-r * 0.35, -r * 0.35, 1, -r * 0.35, -r * 0.35, r * 0.7);
+        shine.addColorStop(0, 'rgba(255, 255, 255, 0.72)');
+        shine.addColorStop(0.35, 'rgba(255, 255, 255, 0.18)');
+        shine.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = shine;
+        ctx.fillRect(-r, -r, r * 2, r * 2);
+
+        ctx.restore();
+      }
+
+      // Disegno del cerchietto bianco e del numero con prospettiva ed elisse 3D
+      drawSpot(ctx, norm, up, number, r) {
+        // Se il centro della toppa è sull'emisfero posteriore (z <= 0), non è visibile!
+        if (norm.z <= -0.05) return;
+
+        const spotRadius = r * 0.46;
+        const cx = norm.x * r;
+        const cy = norm.y * r;
+        const zClamped = Math.max(0.01, norm.z);
+        const tiltAngle = Math.atan2(norm.y, norm.x);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        // Deformazione prospettica: un cerchio su una sfera proiettato ortograficamente forma un'ellisse
+        // con semiasse minore schiacciato dal fattore norm.z
+        ctx.beginPath();
+        ctx.ellipse(0, 0, spotRadius * zClamped, spotRadius, tiltAngle, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+
+        // Disegno del numero solo se sufficientemente rivolto verso la telecamera
+        if (norm.z > 0.18) {
+          const upAngle = Math.atan2(up.y, up.x) + Math.PI / 2;
+          ctx.rotate(upAngle);
+          ctx.scale(zClamped, 1);
+
+          const fontSize = Math.round(r * 0.58);
+          ctx.font = `bold ${fontSize}px 'Cinzel', serif`;
+          ctx.fillStyle = '#000000';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(number.toString(), 0, 0.5);
+
+          // Trattino per distinguere 6 e 9
+          if (number === 6 || number === 9) {
+            ctx.beginPath();
+            ctx.moveTo(-fontSize * 0.25, fontSize * 0.42);
+            ctx.lineTo(fontSize * 0.25, fontSize * 0.42);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#000000';
+            ctx.stroke();
+          }
+        }
+
+        ctx.restore();
+      }
+
+      // Disegno della fascia colorata 3D per le bilie rigate
+      draw3DStripe(ctx, stripeColor, r) {
+        // Asse dei poli della fascia
+        const p = this.quat.rotateVector(1, 0, 0);
+        const d = 0.52; // semilarghezza angolare della fascia (sinus)
+        const rCircle = Math.sqrt(Math.max(0, 1 - d * d));
+
+        // Base ortonormale (u, v) perpendicolare a p
+        let ux, uy, uz;
+        if (Math.abs(p.z) < 0.9) {
+          const len = Math.hypot(p.y, -p.x);
+          ux = p.y / len; uy = -p.x / len; uz = 0;
+        } else {
+          const len = Math.hypot(p.z, -p.y);
+          ux = 0; uy = p.z / len; uz = -p.y / len;
+        }
+        const vx = p.y * uz - p.z * uy;
+        const vy = p.z * ux - p.x * uz;
+        const vz = p.x * uy - p.y * ux;
+
+        const steps = 28;
+        ctx.beginPath();
+
+        for (let i = 0; i < steps; i++) {
+          const a1 = (i / steps) * Math.PI * 2;
+          const a2 = ((i + 1) / steps) * Math.PI * 2;
+
+          const cos1 = Math.cos(a1), sin1 = Math.sin(a1);
+          const cos2 = Math.cos(a2), sin2 = Math.sin(a2);
+
+          // 4 vertici del quad 3D della fascia
+          // Bordo 1 (+d)
+          const p1x = (d * p.x + rCircle * (cos1 * ux + sin1 * vx)) * r;
+          const p1y = (d * p.y + rCircle * (cos1 * uy + sin1 * vy)) * r;
+          const p1z = d * p.z + rCircle * (cos1 * uz + sin1 * vz);
+
+          const p2x = (d * p.x + rCircle * (cos2 * ux + sin2 * vx)) * r;
+          const p2y = (d * p.y + rCircle * (cos2 * uy + sin2 * vy)) * r;
+          const p2z = d * p.z + rCircle * (cos2 * uz + sin2 * vz);
+
+          // Bordo 2 (-d)
+          const p3x = (-d * p.x + rCircle * (cos2 * ux + sin2 * vx)) * r;
+          const p3y = (-d * p.y + rCircle * (cos2 * uy + sin2 * vy)) * r;
+          const p3z = -d * p.z + rCircle * (cos2 * uz + sin2 * vz);
+
+          const p4x = (-d * p.x + rCircle * (cos1 * ux + sin1 * vx)) * r;
+          const p4y = (-d * p.y + rCircle * (cos1 * uy + sin1 * vy)) * r;
+          const p4z = -d * p.z + rCircle * (cos1 * uz + sin1 * vz);
+
+          // Disegna solo se parzialmente visibile sul davanti
+          if (Math.max(p1z, p2z, p3z, p4z) > -0.15) {
+            ctx.moveTo(p1x, p1y);
+            ctx.lineTo(p2x, p2y);
+            ctx.lineTo(p3x, p3y);
+            ctx.lineTo(p4x, p4y);
+            ctx.closePath();
+          }
+        }
+
+        ctx.fillStyle = stripeColor;
+        ctx.fill();
+      }
+
+      lightenColor(col, pct) { return this.adjustColor(col, pct); }
+      darkenColor(col, pct) { return this.adjustColor(col, -pct); }
+
+      adjustColor(hex, amount) {
+        let usePound = false;
+        if (hex[0] === '#') {
+          hex = hex.slice(1);
+          usePound = true;
+        }
+        const num = parseInt(hex, 16);
+        let r = (num >> 16) + amount;
+        let g = ((num >> 8) & 0x00ff) + amount;
+        let b = (num & 0x0000ff) + amount;
+
+        r = Math.min(255, Math.max(0, r));
+        g = Math.min(255, Math.max(0, g));
+        b = Math.min(255, Math.max(0, b));
+
+        return (usePound ? '#' : '') + (b | (g << 8) | (r << 16)).toString(16).padStart(6, '0');
+      }
+    }
+
+    // --- STRUTTURA DEL TAVOLO (ESTETICA NEOCLASSICA & GEOMETRIA) ---
+    class PoolTable {
+      constructor() {
+        this.width = 1120;
+        this.height = 620;
+
+        this.railThickness = 60;
+        this.playX = this.railThickness;
+        this.playY = this.railThickness;
+        this.playW = this.width - this.railThickness * 2;   // 1000px
+        this.playH = this.height - this.railThickness * 2;  // 500px
+
+        this.ballRadius = 13.5;
+        this.cornerPocketRadius = 31;
+        this.sidePocketRadius = 26;
+
+        this.pockets = [
+          { id: 'TL', x: this.playX, y: this.playY, r: this.cornerPocketRadius, isCorner: true },
+          { id: 'TC', x: this.playX + this.playW / 2, y: this.playY - 3, r: this.sidePocketRadius, isCorner: false },
+          { id: 'TR', x: this.playX + this.playW, y: this.playY, r: this.cornerPocketRadius, isCorner: true },
+          { id: 'BL', x: this.playX, y: this.playY + this.playH, r: this.cornerPocketRadius, isCorner: true },
+          { id: 'BC', x: this.playX + this.playW / 2, y: this.playY + this.playH + 3, r: this.sidePocketRadius, isCorner: false },
+          { id: 'BR', x: this.playX + this.playW, y: this.playY + this.playH, r: this.cornerPocketRadius, isCorner: true }
+        ];
+
+        this.initCushions();
+      }
+
+      initCushions() {
+        const x1 = this.playX;
+        const y1 = this.playY;
+        const x2 = this.playX + this.playW;
+        const y2 = this.playY + this.playH;
+        const midX = (x1 + x2) / 2;
+
+        const cIndent = 42;
+        const sIndent = 30;
+        const D = 18;
+
+        this.cushionSegments = [
+          // SPONDA SUPERIORE SINISTRA
+          { p1: { x: x1 + cIndent, y: y1 }, p2: { x: midX - sIndent, y: y1 }, name: 'Top-Left' },
+          { p1: { x: x1 + cIndent, y: y1 }, p2: { x: x1 + cIndent - 18, y: y1 - D }, name: 'TL-Facing' },
+          { p1: { x: midX - sIndent, y: y1 }, p2: { x: midX - sIndent + 10, y: y1 - D }, name: 'TC-Facing-L' },
+
+          // SPONDA SUPERIORE DESTRA
+          { p1: { x: midX + sIndent, y: y1 }, p2: { x: x2 - cIndent, y: y1 }, name: 'Top-Right' },
+          { p1: { x: midX + sIndent, y: y1 }, p2: { x: midX + sIndent - 10, y: y1 - D }, name: 'TC-Facing-R' },
+          { p1: { x: x2 - cIndent, y: y1 }, p2: { x: x2 - cIndent + 18, y: y1 - D }, name: 'TR-Facing' },
+
+          // SPONDA INFERIORE SINISTRA
+          { p1: { x: x1 + cIndent, y: y2 }, p2: { x: midX - sIndent, y: y2 }, name: 'Bottom-Left' },
+          { p1: { x: x1 + cIndent, y: y2 }, p2: { x: x1 + cIndent - 18, y: y2 + D }, name: 'BL-Facing' },
+          { p1: { x: midX - sIndent, y: y2 }, p2: { x: midX - sIndent + 10, y: y2 + D }, name: 'BC-Facing-L' },
+
+          // SPONDA INFERIORE DESTRA
+          { p1: { x: midX + sIndent, y: y2 }, p2: { x: x2 - cIndent, y: y2 }, name: 'Bottom-Right' },
+          { p1: { x: midX + sIndent, y: y2 }, p2: { x: midX + sIndent - 10, y: y2 + D }, name: 'BC-Facing-R' },
+          { p1: { x: x2 - cIndent, y: y2 }, p2: { x: x2 - cIndent + 18, y: y2 + D }, name: 'BR-Facing' },
+
+          // SPONDA CORTA SINISTRA (Short Left)
+          { p1: { x: x1, y: y1 + cIndent }, p2: { x: x1, y: y2 - cIndent }, name: 'Left' },
+          { p1: { x: x1, y: y1 + cIndent }, p2: { x: x1 - D, y: y1 + cIndent - 18 }, name: 'L-Top-Facing' },
+          { p1: { x: x1, y: y2 - cIndent }, p2: { x: x1 - D, y: y2 - cIndent + 18 }, name: 'L-Bottom-Facing' },
+
+          // SPONDA CORTA DESTRA (Short Right)
+          { p1: { x: x2, y: y1 + cIndent }, p2: { x: x2, y: y2 - cIndent }, name: 'Right' },
+          { p1: { x: x2, y: y1 + cIndent }, p2: { x: x2 + D, y: y1 + cIndent - 18 }, name: 'R-Top-Facing' },
+          { p1: { x: x2, y: y2 - cIndent }, p2: { x: x2 + D, y: y2 - cIndent + 18 }, name: 'R-Bottom-Facing' }
+        ];
+      }
+
+      draw(ctx) {
+        ctx.save();
+
+        // 1. TELAIO ESTERNO IN RADICA DI NOCE E MOGANO IMPERIALE
+        const woodGrad = ctx.createLinearGradient(0, 0, this.width, this.height);
+        woodGrad.addColorStop(0, '#2d1409');
+        woodGrad.addColorStop(0.3, '#4a2312');
+        woodGrad.addColorStop(0.7, '#381a0d');
+        woodGrad.addColorStop(1, '#1f0d06');
+
+        ctx.fillStyle = woodGrad;
+        this.roundRect(ctx, 0, 0, this.width, this.height, 14);
+        ctx.fill();
+
+        // Bordo in ottone brunito esterno
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#c5a059';
+        ctx.stroke();
+
+        // 2. DOPPIO FILETTO D'ORO NEOCLASSICO (INTARSIO A FILETTATURA)
+        ctx.save();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.55)';
+        this.roundRect(ctx, 12, 12, this.width - 24, this.height - 24, 10);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+        this.roundRect(ctx, 16, 16, this.width - 32, this.height - 32, 8);
+        ctx.stroke();
+        ctx.restore();
+
+        // Diamanti segnapunti intarsiati in avorio e oro
+        this.drawSights(ctx);
+
+        // 3. BASE INTERNA SOTTO IL PANNO E LE SPONDE
+        ctx.fillStyle = '#092d17';
+        ctx.fillRect(this.playX - 18, this.playY - 18, this.playW + 36, this.playH + 36);
+
+        // 4. PANNO VERDE SMERALDO IMPERIALE (PIANO DI GIOCO)
+        const clothGrad = ctx.createRadialGradient(
+          this.playX + this.playW / 2, this.playY + this.playH / 2, 40,
+          this.playX + this.playW / 2, this.playY + this.playH / 2, this.playW * 0.62
+        );
+        clothGrad.addColorStop(0, '#156b3e');
+        clothGrad.addColorStop(0.65, '#105631');
+        clothGrad.addColorStop(1, '#093a20');
+
+        ctx.fillStyle = clothGrad;
+        ctx.fillRect(this.playX, this.playY, this.playW, this.playH);
+
+        // Ombreggiatura perimetrale proiettata dalle sponde sul piano di gioco
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+        ctx.fillRect(this.playX, this.playY, this.playW, 7);
+        ctx.fillRect(this.playX, this.playY + this.playH - 7, this.playW, 7);
+        ctx.fillRect(this.playX, this.playY, 7, this.playH);
+        ctx.fillRect(this.playX + this.playW - 7, this.playY, 7, this.playH);
+        ctx.restore();
+
+        // 5. LINEA DI SPACCATA (KITCHEN / HEAD STRING) & SPOTS
+        const kitchenX = this.playX + this.playW * 0.25;
+        ctx.beginPath();
+        ctx.setLineDash([5, 5]);
+        ctx.moveTo(kitchenX, this.playY);
+        ctx.lineTo(kitchenX, this.playY + this.playH);
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Head Spot
+        ctx.beginPath();
+        ctx.arc(kitchenX, this.playY + this.playH / 2, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#d4af37';
+        ctx.fill();
+
+        // Foot Spot
+        const footX = this.playX + this.playW * 0.72;
+        ctx.beginPath();
+        ctx.arc(footX, this.playY + this.playH / 2, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#d4af37';
+        ctx.fill();
+
+        // Rosette / Fregi sottili sugli spot
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 6. SPONDE 3D SOLIDE SAGOMATE (CUSHIONS)
+        this.drawSolidCushions(ctx);
+
+        // 7. DISEGNO DELLE 6 BUCHE CON PLACCHE IN BRONZO CESELLATO
+        this.pockets.forEach(p => {
+          // Placca esterna sagomata in bronzo neoclassico
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r + 6, 0, Math.PI * 2);
+          const bronzeGrad = ctx.createRadialGradient(p.x - 2, p.y - 2, 2, p.x, p.y, p.r + 6);
+          bronzeGrad.addColorStop(0, '#8c703b');
+          bronzeGrad.addColorStop(0.7, '#4e3b1c');
+          bronzeGrad.addColorStop(1, '#2a1e0d');
+          ctx.fillStyle = bronzeGrad;
+          ctx.fill();
+
+          ctx.strokeStyle = '#d4af37';
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+
+          // Viti dorate d'epoca di fissaggio
+          if (p.isCorner) {
+            this.drawPocketScrew(ctx, p.x + (p.x < 500 ? 12 : -12), p.y + (p.y < 300 ? 12 : -12));
+          }
+
+          // Fondo nero della buca
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          const pGrad = ctx.createRadialGradient(p.x - 3, p.y - 3, 2, p.x, p.y, p.r);
+          pGrad.addColorStop(0, '#1a1d24');
+          pGrad.addColorStop(0.65, '#080a0d');
+          pGrad.addColorStop(1, '#000000');
+          ctx.fillStyle = pGrad;
+          ctx.fill();
+        });
+
+        ctx.restore();
+      }
+
+      drawSolidCushions(ctx) {
+        ctx.save();
+
+        const x1 = this.playX;
+        const y1 = this.playY;
+        const x2 = this.playX + this.playW;
+        const y2 = this.playY + this.playH;
+        const midX = (x1 + x2) / 2;
+
+        const cIndent = 42;
+        const sIndent = 30;
+        const D = 18;
+
+        const cushions = [
+          // 1. Sponda Superiore Sinistra (Top-Left)
+          {
+            poly: [
+              { x: x1 + cIndent, y: y1 },
+              { x: midX - sIndent, y: y1 },
+              { x: midX - sIndent + 10, y: y1 - D },
+              { x: x1 + cIndent - 18, y: y1 - D }
+            ],
+            nose: [{ x: x1 + cIndent, y: y1 }, { x: midX - sIndent, y: y1 }],
+            grad: { x0: 0, y0: y1 - D, x1: 0, y1: y1 }
+          },
+          // 2. Sponda Superiore Destra (Top-Right)
+          {
+            poly: [
+              { x: midX + sIndent, y: y1 },
+              { x: x2 - cIndent, y: y1 },
+              { x: x2 - cIndent + 18, y: y1 - D },
+              { x: midX + sIndent - 10, y: y1 - D }
+            ],
+            nose: [{ x: midX + sIndent, y: y1 }, { x: x2 - cIndent, y: y1 }],
+            grad: { x0: 0, y0: y1 - D, x1: 0, y1: y1 }
+          },
+          // 3. Sponda Inferiore Sinistra (Bottom-Left)
+          {
+            poly: [
+              { x: x1 + cIndent, y: y2 },
+              { x: midX - sIndent, y: y2 },
+              { x: midX - sIndent + 10, y: y2 + D },
+              { x: x1 + cIndent - 18, y: y2 + D }
+            ],
+            nose: [{ x: x1 + cIndent, y: y2 }, { x: midX - sIndent, y: y2 }],
+            grad: { x0: 0, y0: y2 + D, x1: 0, y1: y2 }
+          },
+          // 4. Sponda Inferiore Destra (Bottom-Right)
+          {
+            poly: [
+              { x: midX + sIndent, y: y2 },
+              { x: x2 - cIndent, y: y2 },
+              { x: x2 - cIndent + 18, y: y2 + D },
+              { x: midX + sIndent - 10, y: y2 + D }
+            ],
+            nose: [{ x: midX + sIndent, y: y2 }, { x: x2 - cIndent, y: y2 }],
+            grad: { x0: 0, y0: y2 + D, x1: 0, y1: y2 }
+          },
+          // 5. Sponda Corta Sinistra (Short Left - perfettamente simmetrica e verticale)
+          {
+            poly: [
+              { x: x1, y: y1 + cIndent },
+              { x: x1, y: y2 - cIndent },
+              { x: x1 - D, y: y2 - cIndent + 18 },
+              { x: x1 - D, y: y1 + cIndent - 18 }
+            ],
+            nose: [{ x: x1, y: y1 + cIndent }, { x: x1, y: y2 - cIndent }],
+            grad: { x0: x1 - D, y0: 0, x1: x1, y1: 0 }
+          },
+          // 6. Sponda Corta Destra (Short Right - perfettamente simmetrica e verticale)
+          {
+            poly: [
+              { x: x2, y: y1 + cIndent },
+              { x: x2, y: y2 - cIndent },
+              { x: x2 + D, y: y2 - cIndent + 18 },
+              { x: x2 + D, y: y1 + cIndent - 18 }
+            ],
+            nose: [{ x: x2, y: y1 + cIndent }, { x: x2, y: y2 - cIndent }],
+            grad: { x0: x2 + D, y0: 0, x1: x2, y1: 0 }
+          }
+        ];
+
+        // Disegna ogni sponda solida con gradiente di volume e filo d'impatto illuminato
+        cushions.forEach(c => {
+          const g = ctx.createLinearGradient(c.grad.x0, c.grad.y0, c.grad.x1, c.grad.y1);
+          g.addColorStop(0, '#0a3a1f');
+          g.addColorStop(0.65, '#115c33');
+          g.addColorStop(1, '#1c7d47');
+
+          ctx.beginPath();
+          ctx.moveTo(c.poly[0].x, c.poly[0].y);
+          for (let i = 1; i < c.poly.length; i++) {
+            ctx.lineTo(c.poly[i].x, c.poly[i].y);
+          }
+          ctx.closePath();
+          ctx.fillStyle = g;
+          ctx.fill();
+
+          // Sottile profilo scuro di raccordo
+          ctx.strokeStyle = '#062011';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Filo riflettente illuminato sul becco (nose) d'impatto della sponda
+          ctx.beginPath();
+          ctx.moveTo(c.nose[0].x, c.nose[0].y);
+          ctx.lineTo(c.nose[1].x, c.nose[1].y);
+          ctx.strokeStyle = 'rgba(74, 222, 128, 0.6)';
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+        });
+
+        ctx.restore();
+      }
+
+      drawPocketScrew(ctx, x, y) {
+        ctx.beginPath();
+        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = '#e5c065';
+        ctx.fill();
+        ctx.strokeStyle = '#4e3b1c';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+
+      drawSights(ctx) {
+        const numH = 6;
+        const numV = 3;
+
+        // Diamanti intarsiati a doppio rombo (avorio e bordo dorato)
+        for (let i = 1; i <= numH; i++) {
+          if (i === 3.5) continue;
+          const sx = this.playX + (this.playW * i) / (numH + 1);
+          this.drawNeoclassicDiamond(ctx, sx, this.railThickness * 0.45, 5);
+          this.drawNeoclassicDiamond(ctx, sx, this.height - this.railThickness * 0.45, 5);
+        }
+
+        for (let i = 1; i <= numV; i++) {
+          const sy = this.playY + (this.playH * i) / (numV + 1);
+          this.drawNeoclassicDiamond(ctx, this.railThickness * 0.45, sy, 5);
+          this.drawNeoclassicDiamond(ctx, this.width - this.railThickness * 0.45, sy, 5);
+        }
+      }
+
+      drawNeoclassicDiamond(ctx, cx, cy, size) {
+        // Base dorata
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - size);
+        ctx.lineTo(cx + size, cy);
+        ctx.lineTo(cx, cy + size);
+        ctx.lineTo(cx - size, cy);
+        ctx.closePath();
+        ctx.fillStyle = '#dfba5a';
+        ctx.fill();
+
+        // Interno avorio
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - (size - 1.5));
+        ctx.lineTo(cx + (size - 1.5), cy);
+        ctx.lineTo(cx, cy + (size - 1.5));
+        ctx.lineTo(cx - (size - 1.5), cy);
+        ctx.closePath();
+        ctx.fillStyle = '#fdfbf7';
+        ctx.fill();
+
+        ctx.strokeStyle = '#3d260f';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+
+      roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      }
+    }
+
+    // --- GAME ENGINE PRINCIPALE ---
+    class PoolGame {
+      constructor() {
+        this.canvas = document.getElementById('poolCanvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        this.table = new PoolTable();
+        this.balls = [];
+        this.cueBall = null;
+
+        this.mode = 'pvp'; // 'pvp' o 'solo'
+        this.currentPlayer = 1;
+        this.groups = { 1: null, 2: null };
+
+        this.gameState = 'BREAK'; // 'BREAK', 'AIMING', 'STRIKING', 'ROLLING', 'BALL_IN_HAND', 'GAME_OVER'
+
+        this.cueAngle = 0;
+        this.power = 0;
+        this.mousePos = { x: 0, y: 0 };
+        this.isDraggingPower = false;
+        this.isDraggingCueOnCanvas = false;
+        this.canvasDragStartY = 0;
+        this.ballInHandPos = { x: 0, y: 0 };
+        this.ballInHandValid = true;
+        this.wasBreakFoul = false;
+
+        this.strikeAnim = {
+          active: false,
+          progress: 0,
+          initialOffset: 0
+        };
+
+        this.shotEvents = {
+          firstBallHit: null,
+          cushionHitAfterBall: false,
+          pocketedThisTurn: [],
+          cuePocketed: false,
+          eightPocketed: false
+        };
+
+        this.initDOM();
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+
+        this.setupEventListeners();
+        this.initRack();
+
+        this.lastTime = performance.now();
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+
+      initDOM() {
+        this.dom = {
+          cardP1: document.getElementById('cardP1'),
+          cardP2: document.getElementById('cardP2'),
+          nameP1: document.getElementById('nameP1'),
+          nameP2: document.getElementById('nameP2'),
+          groupP1: document.getElementById('groupP1'),
+          groupP2: document.getElementById('groupP2'),
+          rackP1: document.getElementById('rackP1'),
+          rackP2: document.getElementById('rackP2'),
+          modeBadge: document.getElementById('modeBadge'),
+          toastOverlay: document.getElementById('toastOverlay'),
+          toastTitle: document.getElementById('toastTitle'),
+          toastDesc: document.getElementById('toastDesc'),
+          powerTrack: document.getElementById('powerTrack'),
+          powerFill: document.getElementById('powerFill'),
+          powerHandle: document.getElementById('powerHandle'),
+          powerPct: document.getElementById('powerPct'),
+          btnRestart: document.getElementById('btnRestart'),
+          btnMode: document.getElementById('btnMode'),
+          btnSound: document.getElementById('btnSound'),
+          btnRules: document.getElementById('btnRules'),
+          rulesModal: document.getElementById('rulesModal'),
+          btnCloseRules: document.getElementById('btnCloseRules'),
+          gameOverModal: document.getElementById('gameOverModal'),
+          winnerTitle: document.getElementById('winnerTitle'),
+          winnerReason: document.getElementById('winnerReason'),
+          btnPlayAgain: document.getElementById('btnPlayAgain')
+        };
+      }
+
+      resizeCanvas() {
+        const maxW = Math.min(window.innerWidth - (window.innerWidth > 1180 ? 170 : 40), 1160);
+        const maxH = window.innerHeight - 175;
+
+        let scale = Math.min(maxW / this.table.width, maxH / this.table.height);
+        if (scale > 1) scale = 1;
+        if (scale < 0.45) scale = 0.45;
+
+        this.scale = scale;
+        this.canvas.width = this.table.width * scale;
+        this.canvas.height = this.table.height * scale;
+        this.canvas.style.width = `${this.canvas.width}px`;
+        this.canvas.style.height = `${this.canvas.height}px`;
+      }
+
+      initRack() {
+        this.balls = [];
+
+        const kitchenX = this.table.playX + this.table.playW * 0.25;
+        const centerY = this.table.playY + this.table.playH / 2;
+        this.cueBall = new Ball(0, kitchenX, centerY, this.table.ballRadius);
+        this.balls.push(this.cueBall);
+
+        const footX = this.table.playX + this.table.playW * 0.72;
+        const r = this.table.ballRadius;
+        const dx = r * Math.sqrt(3) + 0.3;
+        const dy = r * 2 + 0.3;
+
+        const rackLayout = [
+          [1],
+          [9, 2],
+          [3, 8, 10], // 8-ball al centro
+          [11, 4, 12, 5],
+          [6, 13, 7, 14, 15]
+        ];
+
+        for (let col = 0; col < rackLayout.length; col++) {
+          const rowBalls = rackLayout[col];
+          const colX = footX + col * dx;
+          const startY = centerY - ((rowBalls.length - 1) * dy) / 2;
+
+          for (let row = 0; row < rowBalls.length; row++) {
+            const num = rowBalls[row];
+            const ballY = startY + row * dy;
+            const b = new Ball(num, colX, ballY, r);
+            this.balls.push(b);
+          }
+        }
+
+        this.currentPlayer = 1;
+        this.groups = { 1: null, 2: null };
+        this.gameState = 'BREAK';
+        this.cueAngle = 0;
+        this.power = 0;
+        this.strikeAnim.active = false;
+        this.updatePowerUI(0);
+        this.updatePlayerHUD();
+        this.showToast('SPACCATA D\'APERTURA', 'Il Giocatore I apre la contesa dalla linea di testa');
+      }
+
+      setupEventListeners() {
+        const getCanvasCoords = (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return {
+            x: (clientX - rect.left) / this.scale,
+            y: (clientY - rect.top) / this.scale
+          };
+        };
+
+        const onMove = (e) => {
+          const coords = getCanvasCoords(e);
+          this.mousePos = coords;
+
+          if (this.gameState === 'BALL_IN_HAND') {
+            this.updateBallInHandPlacement(coords);
+          } else if (this.isDraggingCueOnCanvas) {
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const deltaY = clientY - this.canvasDragStartY;
+            const p = Math.max(0, Math.min(1, deltaY / 220));
+            this.power = p;
+            this.updatePowerUI(p);
+          } else if (this.gameState === 'AIMING' || this.gameState === 'BREAK') {
+            if (this.cueBall && !this.cueBall.isPocketed) {
+              const dx = coords.x - this.cueBall.x;
+              const dy = coords.y - this.cueBall.y;
+              this.cueAngle = Math.atan2(dy, dx);
+            }
+          }
+        };
+
+        this.canvas.addEventListener('mousemove', onMove);
+        this.canvas.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          onMove(e);
+        }, { passive: false });
+
+        this.canvas.addEventListener('mousedown', (e) => {
+          sound.init();
+          const coords = getCanvasCoords(e);
+
+          if (this.gameState === 'BALL_IN_HAND') {
+            if (this.ballInHandValid) {
+              this.confirmBallInHandPlacement();
+            }
+          } else if (this.gameState === 'BREAK') {
+            const distToCue = Math.hypot(coords.x - this.cueBall.x, coords.y - this.cueBall.y);
+            if (distToCue < this.table.ballRadius * 2.5) {
+              this.wasBreakFoul = true;
+              this.gameState = 'BALL_IN_HAND';
+              this.updateBallInHandPlacement(coords);
+              return;
+            }
+            this.isDraggingCueOnCanvas = true;
+            this.canvasDragStartY = e.clientY;
+          } else if (this.gameState === 'AIMING') {
+            this.isDraggingCueOnCanvas = true;
+            this.canvasDragStartY = e.clientY;
+          }
+        });
+
+        window.addEventListener('mouseup', () => {
+          if (this.isDraggingCueOnCanvas) {
+            this.isDraggingCueOnCanvas = false;
+            if (this.power > 0.04 && (this.gameState === 'AIMING' || this.gameState === 'BREAK')) {
+              this.startStrikeAnimation();
+            }
+          }
+        });
+
+        const powerTrack = this.dom.powerTrack;
+        const onPowerMove = (e) => {
+          const rect = powerTrack.getBoundingClientRect();
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const ratio = 1 - (clientY - rect.top) / rect.height;
+          const clamped = Math.max(0, Math.min(1, ratio));
+          this.power = clamped;
+          this.updatePowerUI(clamped);
+        };
+
+        const startPowerDrag = (e) => {
+          sound.init();
+          this.isDraggingPower = true;
+          onPowerMove(e);
+
+          const moveHandler = (ev) => onPowerMove(ev);
+          const stopHandler = () => {
+            this.isDraggingPower = false;
+            window.removeEventListener('mousemove', moveHandler);
+            window.removeEventListener('mouseup', stopHandler);
+            window.removeEventListener('touchmove', moveHandler);
+            window.removeEventListener('touchend', stopHandler);
+
+            if (this.power > 0.04 && (this.gameState === 'AIMING' || this.gameState === 'BREAK')) {
+              this.startStrikeAnimation();
+            }
+          };
+
+          window.addEventListener('mousemove', moveHandler);
+          window.addEventListener('mouseup', stopHandler);
+          window.addEventListener('touchmove', moveHandler);
+          window.addEventListener('touchend', stopHandler);
+        };
+
+        powerTrack.addEventListener('mousedown', startPowerDrag);
+        powerTrack.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          startPowerDrag(e);
+        }, { passive: false });
+
+        // Tasti di regolazione fine
+        window.addEventListener('keydown', (e) => {
+          sound.init();
+          if (this.gameState === 'AIMING' || this.gameState === 'BREAK') {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+              this.cueAngle -= 0.015;
+            } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+              this.cueAngle += 0.015;
+            } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+              this.power = Math.min(1, this.power + 0.05);
+              this.updatePowerUI(this.power);
+            } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+              this.power = Math.max(0, this.power - 0.05);
+              this.updatePowerUI(this.power);
+            } else if (e.key === ' ' || e.code === 'Space') {
+              e.preventDefault();
+              if (this.power < 0.1) {
+                this.power = 0.55;
+                this.updatePowerUI(this.power);
+              }
+              this.startStrikeAnimation();
+            }
+          }
+        });
+
+        // Pulsanti UI
+        this.dom.btnRestart.addEventListener('click', () => {
+          sound.init();
+          this.initRack();
+        });
+
+        this.dom.btnMode.addEventListener('click', () => {
+          sound.init();
+          this.mode = (this.mode === 'pvp') ? 'solo' : 'pvp';
+          this.dom.btnMode.textContent = (this.mode === 'pvp') ? '👥 Modalità: Dvo Giocatori' : '👤 Modalità: Solitario';
+          this.dom.modeBadge.textContent = (this.mode === 'pvp') ? 'Dvo Giocatori · Locale' : 'Solitario · Pratica';
+          this.dom.nameP2.textContent = (this.mode === 'pvp') ? 'Giocatore II' : 'Solitario';
+          this.initRack();
+        });
+
+        this.dom.btnSound.addEventListener('click', () => {
+          sound.enabled = !sound.enabled;
+          this.dom.btnSound.textContent = sound.enabled ? '🔊 Audio: Attivo' : '🔇 Audio: Muto';
+          if (sound.enabled) sound.init();
+        });
+
+        this.dom.btnRules.addEventListener('click', () => {
+          this.dom.rulesModal.classList.add('open');
+        });
+        this.dom.btnCloseRules.addEventListener('click', () => {
+          this.dom.rulesModal.classList.remove('open');
+        });
+
+        this.dom.btnPlayAgain.addEventListener('click', () => {
+          this.dom.gameOverModal.classList.remove('open');
+          this.initRack();
+        });
+      }
+
+      updatePowerUI(val) {
+        const pct = Math.round(val * 100);
+        this.dom.powerFill.style.height = `${pct}%`;
+        this.dom.powerHandle.style.bottom = `${pct}%`;
+        this.dom.powerPct.textContent = `${pct}%`;
+      }
+
+      updateBallInHandPlacement(coords) {
+        const minX = this.table.playX + this.table.ballRadius + 2;
+        const maxX = this.table.playX + this.table.playW - this.table.ballRadius - 2;
+        const minY = this.table.playY + this.table.ballRadius + 2;
+        const maxY = this.table.playY + this.table.playH - this.table.ballRadius - 2;
+
+        let x = Math.max(minX, Math.min(maxX, coords.x));
+        let y = Math.max(minY, Math.min(maxY, coords.y));
+
+        if (this.wasBreakFoul) {
+          const kitchenX = this.table.playX + this.table.playW * 0.25;
+          x = Math.min(kitchenX, x);
+        }
+
+        let valid = true;
+        const minDistance = this.table.ballRadius * 2 + 1;
+
+        for (const b of this.balls) {
+          if (b.isCue || b.isPocketed) continue;
+          const dist = Math.hypot(b.x - x, b.y - y);
+          if (dist < minDistance) {
+            valid = false;
+            break;
+          }
+        }
+
+        this.ballInHandPos = { x, y };
+        this.ballInHandValid = valid;
+      }
+
+      confirmBallInHandPlacement() {
+        this.cueBall.x = this.ballInHandPos.x;
+        this.cueBall.y = this.ballInHandPos.y;
+        this.cueBall.vx = 0;
+        this.cueBall.vy = 0;
+        this.cueBall.isPocketed = false;
+        this.cueBall.isPocketing = false;
+        this.cueBall.visible = true;
+
+        this.wasBreakFoul = false;
+        this.gameState = 'AIMING';
+        this.showToast('BILIE DISPOSTE', 'Prendi la mira e calibra la forza');
+      }
+
+      startStrikeAnimation() {
+        if (!this.cueBall || this.cueBall.isPocketed) return;
+
+        this.gameState = 'STRIKING';
+        this.strikeAnim.active = true;
+        this.strikeAnim.progress = 0;
+        this.strikeAnim.initialOffset = 22 + this.power * 80;
+      }
+
+      executeShot() {
+        if (!this.cueBall || this.cueBall.isPocketed) return;
+
+        const maxSpeed = 2200;
+        const shotSpeed = Math.max(90, this.power * maxSpeed);
+
+        this.cueBall.vx = Math.cos(this.cueAngle) * shotSpeed;
+        this.cueBall.vy = Math.sin(this.cueAngle) * shotSpeed;
+
+        sound.playCueHit(this.power);
+
+        this.power = 0;
+        this.updatePowerUI(0);
+        this.strikeAnim.active = false;
+
+        this.shotEvents = {
+          firstBallHit: null,
+          cushionHitAfterBall: false,
+          pocketedThisTurn: [],
+          cuePocketed: false,
+          eightPocketed: false
+        };
+
+        this.gameState = 'ROLLING';
+      }
+
+      updatePhysics(dt) {
+        const subSteps = 8;
+        const subDt = dt / subSteps;
+
+        for (let s = 0; s < subSteps; s++) {
+          for (let i = 0; i < this.balls.length; i++) {
+            this.balls[i].update(subDt);
+          }
+
+          // Collisioni Bilie
+          for (let i = 0; i < this.balls.length; i++) {
+            const b1 = this.balls[i];
+            if (b1.isPocketed || b1.isPocketing) continue;
+
+            for (let j = i + 1; j < this.balls.length; j++) {
+              const b2 = this.balls[j];
+              if (b2.isPocketed || b2.isPocketing) continue;
+
+              const dx = b2.x - b1.x;
+              const dy = b2.y - b1.y;
+              const dist = Math.hypot(dx, dy);
+              const minDist = b1.radius + b2.radius;
+
+              if (dist < minDist && dist > 0.0001) {
+                const overlap = (minDist - dist);
+                const nx = dx / dist;
+                const ny = dy / dist;
+
+                b1.x -= nx * overlap * 0.5;
+                b1.y -= ny * overlap * 0.5;
+                b2.x += nx * overlap * 0.5;
+                b2.y += ny * overlap * 0.5;
+
+                const rvx = b2.vx - b1.vx;
+                const rvy = b2.vy - b1.vy;
+                const velAlongNormal = rvx * nx + rvy * ny;
+
+                if (velAlongNormal < 0) {
+                  const restitution = 0.94;
+                  const impulse = -(1 + restitution) * velAlongNormal / (b1.mass + b2.mass);
+
+                  b1.vx -= (impulse * b2.mass) * nx;
+                  b1.vy -= (impulse * b2.mass) * ny;
+                  b2.vx += (impulse * b1.mass) * nx;
+                  b2.vy += (impulse * b1.mass) * ny;
+
+                  if ((b1.isCue || b2.isCue) && !this.shotEvents.firstBallHit) {
+                    this.shotEvents.firstBallHit = b1.isCue ? b2 : b1;
+                  }
+
+                  sound.playBallHit(Math.abs(velAlongNormal));
+                }
+              }
+            }
+          }
+
+          // Collisioni Sponde
+          for (let i = 0; i < this.balls.length; i++) {
+            const b = this.balls[i];
+            if (b.isPocketed || b.isPocketing) continue;
+
+            for (const seg of this.table.cushionSegments) {
+              this.handleBallSegmentCollision(b, seg);
+            }
+          }
+
+          // Imbucate
+          for (let i = 0; i < this.balls.length; i++) {
+            const b = this.balls[i];
+            if (b.isPocketed || b.isPocketing) continue;
+
+            for (const p of this.table.pockets) {
+              const dist = Math.hypot(b.x - p.x, b.y - p.y);
+              if (dist < p.r - 2) {
+                b.isPocketing = true;
+                b.targetPocket = p;
+                b.pocketAnimProgress = 0;
+
+                sound.playPocketSound();
+
+                if (b.isCue) {
+                  this.shotEvents.cuePocketed = true;
+                } else if (b.isEight) {
+                  this.shotEvents.eightPocketed = true;
+                } else {
+                  this.shotEvents.pocketedThisTurn.push(b);
+                }
+                break;
+              }
+            }
+          }
+        }
+
+        if (this.areAllBallsStopped()) {
+          this.evaluateTurnResults();
+        }
+      }
+
+      handleBallSegmentCollision(b, seg) {
+        const x1 = seg.p1.x, y1 = seg.p1.y;
+        const x2 = seg.p2.x, y2 = seg.p2.y;
+        const l2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+        if (l2 === 0) return;
+
+        let t = ((b.x - x1) * (x2 - x1) + (b.y - y1) * (y2 - y1)) / l2;
+        t = Math.max(0, Math.min(1, t));
+
+        const projX = x1 + t * (x2 - x1);
+        const projY = y1 + t * (y2 - y1);
+
+        const dx = b.x - projX;
+        const dy = b.y - projY;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < b.radius) {
+          let nx = (dist === 0) ? 0 : dx / dist;
+          let ny = (dist === 0) ? -1 : dy / dist;
+
+          const overlap = b.radius - dist;
+          b.x += nx * overlap;
+          b.y += ny * overlap;
+
+          const velDot = b.vx * nx + b.vy * ny;
+          if (velDot < 0) {
+            const cushionRestitution = 0.82;
+            b.vx = b.vx - (1 + cushionRestitution) * velDot * nx;
+            b.vy = b.vy - (1 + cushionRestitution) * velDot * ny;
+
+            if (this.shotEvents.firstBallHit) {
+              this.shotEvents.cushionHitAfterBall = true;
+            }
+
+            sound.playCushionHit(Math.abs(velDot));
+          }
+        }
+      }
+
+      areAllBallsStopped() {
+        for (const b of this.balls) {
+          if (!b.isPocketed && (b.speed > 0 || b.isPocketing)) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      evaluateTurnResults() {
+        let foul = false;
+        let foulMessage = '';
+        let switchTurn = true;
+        let gameOver = false;
+        let winner = null;
+        let winReason = '';
+
+        const playerGroup = this.groups[this.currentPlayer];
+        const isTableOpen = (playerGroup === null);
+        const myRemainingBalls = this.getRemainingBallsForPlayer(this.currentPlayer);
+
+        // 1. Palla 8
+        if (this.shotEvents.eightPocketed) {
+          gameOver = true;
+          if (myRemainingBalls.length > 0 || this.shotEvents.cuePocketed) {
+            winner = (this.currentPlayer === 1) ? 2 : 1;
+            winReason = (myRemainingBalls.length > 0)
+              ? `Il Giocatore ${this.currentPlayer === 1 ? 'I' : 'II'} ha imbucato la palla VIII prima di aver terminato il proprio gruppo!`
+              : `Il Giocatore ${this.currentPlayer === 1 ? 'I' : 'II'} ha imbucato la palla VIII commettendo fallo contestuale!`;
+          } else {
+            winner = this.currentPlayer;
+            winReason = `Il Giocatore ${this.currentPlayer === 1 ? 'I' : 'II'} ha completato il proprio gruppo e imbucato con maestria la palla VIII!`;
+          }
+        }
+
+        if (gameOver) {
+          this.endGame(winner, winReason);
+          return;
+        }
+
+        // 2. Scratch
+        if (this.shotEvents.cuePocketed) {
+          foul = true;
+          foulMessage = 'Fallo! Palla bianca imbucata.';
+        }
+
+        // 3. Tocco errato
+        if (!foul) {
+          if (!this.shotEvents.firstBallHit) {
+            foul = true;
+            foulMessage = 'Fallo! Nessuna bilia toccata.';
+          } else {
+            const hit = this.shotEvents.firstBallHit;
+            if (isTableOpen) {
+              if (hit.isEight && this.getActiveObjectBallsCount() > 1) {
+                foul = true;
+                foulMessage = 'Fallo! A tavolo aperto non puoi colpire la palla VIII per prima.';
+              }
+            } else {
+              // Conteggia le palle del proprio gruppo imbucate in QUESTO turno
+              // per capire cosa era legale colpire all'INIZIO del tiro
+              const pocketedOwnThisTurn = this.shotEvents.pocketedThisTurn.filter(b =>
+                (playerGroup === 'solids' && b.isSolid) || (playerGroup === 'stripes' && b.isStripe)
+              );
+              const hadGroupBallsAtShotStart = (myRemainingBalls.length + pocketedOwnThisTurn.length) > 0;
+
+              if (hadGroupBallsAtShotStart) {
+                // Il giocatore aveva ancora palle del proprio gruppo: deve colpirne una per prima
+                const hitMyGroup = (playerGroup === 'solids' && hit.isSolid) || (playerGroup === 'stripes' && hit.isStripe);
+                if (!hitMyGroup) {
+                  foul = true;
+                  foulMessage = `Fallo! Devi colpire prima una palla del tuo gruppo (${playerGroup === 'solids' ? 'Piene' : 'Rigate'}).`;
+                }
+              } else {
+                // Il giocatore aveva GIÀ terminato il gruppo PRIMA di questo tiro: deve mirare alla VIII
+                if (!hit.isEight) {
+                  foul = true;
+                  foulMessage = 'Fallo! Avendo terminato il gruppo devi mirare alla palla VIII.';
+                }
+              }
+            }
+          }
+        }
+
+        // 4. Regola della sponda
+        if (!foul && !this.shotEvents.cushionHitAfterBall && this.shotEvents.pocketedThisTurn.length === 0) {
+          foul = true;
+          foulMessage = 'Fallo! Nessuna bilia ha toccato sponda dopo il contatto.';
+        }
+
+        // 5. Assegnazione gruppo
+        if (!foul && isTableOpen && this.shotEvents.pocketedThisTurn.length > 0) {
+          const firstPocketed = this.shotEvents.pocketedThisTurn[0];
+          if (firstPocketed.isSolid) {
+            this.groups[this.currentPlayer] = 'solids';
+            this.groups[this.currentPlayer === 1 ? 2 : 1] = 'stripes';
+            this.showToast('ASSEGNAZIONE DEL GRUPPO', `Giocatore ${this.currentPlayer === 1 ? 'I' : 'II'} ha le PIENE (I-VII), Giocatore ${this.currentPlayer === 1 ? 'II' : 'I'} ha le RIGATE (IX-XV)!`);
+          } else if (firstPocketed.isStripe) {
+            this.groups[this.currentPlayer] = 'stripes';
+            this.groups[this.currentPlayer === 1 ? 2 : 1] = 'solids';
+            this.showToast('ASSEGNAZIONE DEL GRUPPO', `Giocatore ${this.currentPlayer === 1 ? 'I' : 'II'} ha le RIGATE (IX-XV), Giocatore ${this.currentPlayer === 1 ? 'II' : 'I'} ha le PIENE (I-VII)!`);
+          }
+        }
+
+        // 6. Continua turno
+        if (!foul) {
+          if (isTableOpen) {
+            if (this.shotEvents.pocketedThisTurn.length > 0) {
+              switchTurn = false;
+            }
+          } else {
+            const curGroup = this.groups[this.currentPlayer];
+            const pocketedOwn = this.shotEvents.pocketedThisTurn.some(b => {
+              return (curGroup === 'solids' && b.isSolid) || (curGroup === 'stripes' && b.isStripe);
+            });
+            if (pocketedOwn) {
+              switchTurn = false;
+            }
+          }
+        }
+
+        // 7. Risoluzione
+        if (foul) {
+          sound.playFoulSound();
+          this.showToast('FALLO COMMESSO', `${foulMessage} Palla in mano all'avversario.`);
+
+          this.switchPlayer();
+          this.prepareBallInHand();
+        } else {
+          if (switchTurn) {
+            this.switchPlayer();
+            this.gameState = 'AIMING';
+          } else {
+            this.showToast('COLPO MAGISTRALE', `Tiro valido! Giocatore ${this.currentPlayer === 1 ? 'I' : 'II'} prosegue il turno.`);
+            this.gameState = 'AIMING';
+          }
+        }
+
+        this.updatePlayerHUD();
+      }
+
+      switchPlayer() {
+        if (this.mode === 'pvp') {
+          this.currentPlayer = (this.currentPlayer === 1) ? 2 : 1;
+        } else {
+          this.currentPlayer = 1;
+        }
+      }
+
+      prepareBallInHand() {
+        this.gameState = 'BALL_IN_HAND';
+        this.cueBall.vx = 0;
+        this.cueBall.vy = 0;
+        this.cueBall.isPocketed = false;
+        this.cueBall.isPocketing = false;
+
+        const cx = this.table.playX + this.table.playW / 2;
+        const cy = this.table.playY + this.table.playH / 2;
+        this.updateBallInHandPlacement({ x: cx, y: cy });
+      }
+
+      getActiveObjectBallsCount() {
+        return this.balls.filter(b => !b.isCue && !b.isPocketed).length;
+      }
+
+      getRemainingBallsForPlayer(player) {
+        const group = this.groups[player];
+        if (!group) return [];
+        return this.balls.filter(b => {
+          if (b.isPocketed) return false;
+          return (group === 'solids' && b.isSolid) || (group === 'stripes' && b.isStripe);
+        });
+      }
+
+      updatePlayerHUD() {
+        if (this.currentPlayer === 1) {
+          this.dom.cardP1.classList.add('active');
+          this.dom.cardP2.classList.remove('active');
+        } else {
+          this.dom.cardP2.classList.add('active');
+          this.dom.cardP1.classList.remove('active');
+        }
+
+        const formatGroup = (g) => {
+          if (!g) return 'Tavolo Aperto';
+          return g === 'solids' ? 'Piene (I-VII)' : 'Rigate (IX-XV)';
+        };
+
+        this.dom.groupP1.textContent = formatGroup(this.groups[1]);
+        this.dom.groupP1.className = `badge-tag ${this.groups[1] || ''}`;
+
+        this.dom.groupP2.textContent = formatGroup(this.groups[2]);
+        this.dom.groupP2.className = `badge-tag ${this.groups[2] || ''}`;
+
+        this.renderRackBalls(this.dom.rackP1, this.groups[1]);
+        this.renderRackBalls(this.dom.rackP2, this.groups[2]);
+      }
+
+      renderRackBalls(container, group) {
+        container.innerHTML = '';
+        if (!group) {
+          for (let i = 0; i < 7; i++) {
+            const dot = document.createElement('span');
+            dot.className = 'mini-ball';
+            container.appendChild(dot);
+          }
+          return;
+        }
+
+        const isSolids = (group === 'solids');
+        const range = isSolids ? [1, 2, 3, 4, 5, 6, 7] : [9, 10, 11, 12, 13, 14, 15];
+
+        let allPocketed = true;
+        range.forEach(num => {
+          const ball = this.balls.find(b => b.number === num);
+          const isPocketed = ball ? ball.isPocketed : true;
+          if (!isPocketed) allPocketed = false;
+
+          const dot = document.createElement('span');
+          dot.className = `mini-ball ${isPocketed ? 'pocketed' : 'active'}`;
+          dot.style.background = BALL_COLORS[num].bg;
+          dot.title = `Bilia ${num}`;
+          container.appendChild(dot);
+        });
+
+        if (allPocketed) {
+          const eightDot = document.createElement('span');
+          eightDot.className = 'mini-ball target-8';
+          eightDot.title = 'Palla VIII — Imbuca per vincere la contesa!';
+          container.appendChild(eightDot);
+        }
+      }
+
+      showToast(title, desc) {
+        this.dom.toastTitle.textContent = title;
+        this.dom.toastDesc.textContent = desc;
+        this.dom.toastOverlay.classList.add('show');
+
+        if (this.toastTimeout) clearTimeout(this.toastTimeout);
+        this.toastTimeout = setTimeout(() => {
+          this.dom.toastOverlay.classList.remove('show');
+        }, 3400);
+      }
+
+      endGame(winner, reason) {
+        this.gameState = 'GAME_OVER';
+        sound.playWinSound();
+
+        const name = (winner === 1) ? 'Giocatore I' : (this.mode === 'pvp' ? 'Giocatore II' : 'Solitario');
+        this.dom.winnerTitle.textContent = `🏆 Trionfo per il ${name}`;
+        this.dom.winnerReason.textContent = reason;
+        this.dom.gameOverModal.classList.add('open');
+      }
+
+      gameLoop(currentTime) {
+        const dt = Math.min((currentTime - this.lastTime) / 1000, 0.05);
+        this.lastTime = currentTime;
+
+        if (this.gameState === 'STRIKING') {
+          this.strikeAnim.progress += dt * 14.0;
+          if (this.strikeAnim.progress >= 1) {
+            this.executeShot();
+          }
+        }
+
+        if (this.gameState === 'ROLLING') {
+          this.updatePhysics(dt);
+        }
+
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.save();
+        this.ctx.scale(this.scale, this.scale);
+
+        // 1. Tavolo da gioco
+        this.table.draw(this.ctx);
+
+        // 2. Linee Guida di Proiezione
+        if (this.gameState === 'AIMING' || this.gameState === 'BREAK') {
+          this.drawAimingGuides(this.ctx);
+        }
+
+        // 3. Bilie
+        for (const ball of this.balls) {
+          ball.draw(this.ctx);
+        }
+
+        // 4. Stecca da biliardo neoclassica
+        if (this.gameState === 'AIMING' || this.gameState === 'BREAK' || this.gameState === 'STRIKING') {
+          this.drawCueStick(this.ctx);
+        }
+
+        // 5. Fantasma Palla in Mano
+        if (this.gameState === 'BALL_IN_HAND') {
+          this.drawBallInHandGhost(this.ctx);
+        }
+
+        this.ctx.restore();
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+
+      drawAimingGuides(ctx) {
+        if (!this.cueBall || this.cueBall.isPocketed) return;
+
+        const startX = this.cueBall.x;
+        const startY = this.cueBall.y;
+        const dirX = Math.cos(this.cueAngle);
+        const dirY = Math.sin(this.cueAngle);
+
+        let closestDist = Infinity;
+        let targetBall = null;
+        const ballR = this.table.ballRadius;
+        const collisionRadius = ballR * 2;
+
+        for (const b of this.balls) {
+          if (b.isCue || b.isPocketed) continue;
+
+          const toBx = b.x - startX;
+          const toBy = b.y - startY;
+
+          const t = toBx * dirX + toBy * dirY;
+          if (t <= 0) continue;
+
+          const perpDistSq = (toBx * toBx + toBy * toBy) - (t * t);
+          if (perpDistSq >= 0 && perpDistSq < collisionRadius * collisionRadius) {
+            const d = t - Math.sqrt(collisionRadius * collisionRadius - perpDistSq);
+            if (d > 0 && d < closestDist) {
+              closestDist = d;
+              targetBall = b;
+            }
+          }
+        }
+
+        ctx.save();
+
+        if (targetBall) {
+          const ghostX = startX + dirX * closestDist;
+          const ghostY = startY + dirY * closestDist;
+
+          // Linea guida principale
+          ctx.beginPath();
+          ctx.setLineDash([5, 5]);
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(ghostX, ghostY);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Ghost Cue Ball
+          ctx.beginPath();
+          ctx.arc(ghostX, ghostY, ballR, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Vettore bersaglio dorato
+          const normX = (targetBall.x - ghostX) / collisionRadius;
+          const normY = (targetBall.y - ghostY) / collisionRadius;
+
+          const targetGuideLength = 160;
+          ctx.beginPath();
+          ctx.moveTo(targetBall.x, targetBall.y);
+          ctx.lineTo(targetBall.x + normX * targetGuideLength, targetBall.y + normY * targetGuideLength);
+          ctx.strokeStyle = '#dfb74a';
+          ctx.lineWidth = 2.4;
+          ctx.stroke();
+
+          this.drawArrowHead(ctx, targetBall.x + normX * targetGuideLength, targetBall.y + normY * targetGuideLength, Math.atan2(normY, normX));
+
+          // Vettore deviazione bianca
+          const dot = dirX * normX + dirY * normY;
+          const cueDeflectX = dirX - dot * normX;
+          const cueDeflectY = dirY - dot * normY;
+          const deflectLen = Math.hypot(cueDeflectX, cueDeflectY);
+
+          if (deflectLen > 0.001) {
+            const cueGuideLength = 70;
+            const cdx = (cueDeflectX / deflectLen) * cueGuideLength;
+            const cdy = (cueDeflectY / deflectLen) * cueGuideLength;
+
+            ctx.beginPath();
+            ctx.setLineDash([4, 4]);
+            ctx.moveTo(ghostX, ghostY);
+            ctx.lineTo(ghostX + cdx, ghostY + cdy);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+
+        } else {
+          // Rimbalzo sponda
+          const bounce = this.raycastTableCushion(startX, startY, dirX, dirY);
+          if (bounce) {
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(bounce.x, bounce.y);
+            ctx.strokeStyle = 'rgba(212, 175, 55, 0.45)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(bounce.x, bounce.y);
+            ctx.lineTo(bounce.x + bounce.rx * 90, bounce.y + bounce.ry * 90);
+            ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+
+        ctx.restore();
+      }
+
+      raycastTableCushion(ox, oy, dx, dy) {
+        const xMin = this.table.playX + this.table.ballRadius;
+        const xMax = this.table.playX + this.table.playW - this.table.ballRadius;
+        const yMin = this.table.playY + this.table.ballRadius;
+        const yMax = this.table.playY + this.table.playH - this.table.ballRadius;
+
+        let bestT = Infinity;
+        let nx = 0, ny = 0;
+
+        if (dx > 0) {
+          const t = (xMax - ox) / dx;
+          if (t > 0 && t < bestT) { bestT = t; nx = -1; ny = 0; }
+        } else if (dx < 0) {
+          const t = (xMin - ox) / dx;
+          if (t > 0 && t < bestT) { bestT = t; nx = 1; ny = 0; }
+        }
+
+        if (dy > 0) {
+          const t = (yMax - oy) / dy;
+          if (t > 0 && t < bestT) { bestT = t; nx = 0; ny = -1; }
+        } else if (dy < 0) {
+          const t = (yMin - oy) / dy;
+          if (t > 0 && t < bestT) { bestT = t; nx = 0; ny = 1; }
+        }
+
+        if (bestT < Infinity) {
+          const hitX = ox + dx * bestT;
+          const hitY = oy + dy * bestT;
+          const dot = dx * nx + dy * ny;
+          const rx = dx - 2 * dot * nx;
+          const ry = dy - 2 * dot * ny;
+          return { x: hitX, y: hitY, rx, ry };
+        }
+        return null;
+      }
+
+      drawArrowHead(ctx, x, y, angle) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-8, -5);
+        ctx.lineTo(-8, 5);
+        ctx.closePath();
+        ctx.fillStyle = '#dfb74a';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      drawCueStick(ctx) {
+        if (!this.cueBall || this.cueBall.isPocketed) return;
+
+        ctx.save();
+        ctx.translate(this.cueBall.x, this.cueBall.y);
+        ctx.rotate(this.cueAngle + Math.PI);
+
+        let pullback = 22 + this.power * 80;
+        if (this.gameState === 'STRIKING') {
+          pullback = this.strikeAnim.initialOffset * (1 - this.strikeAnim.progress) + 14 * this.strikeAnim.progress;
+        }
+
+        const stickLength = 350;
+
+        // Ombra stecca
+        ctx.beginPath();
+        ctx.rect(pullback + 4, 3, stickLength, 6);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+        ctx.fill();
+
+        // 1. Puntale in cuoio azzurro reale
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(pullback, -2, 6, 4);
+
+        // 2. Ghiera in ottone dorato cesellato
+        ctx.fillStyle = '#d4af37';
+        ctx.fillRect(pullback + 6, -2.5, 9, 5);
+
+        // 3. Fusto conico in acero chiaro con venature dorate
+        const shaftGrad = ctx.createLinearGradient(pullback + 15, 0, pullback + stickLength * 0.65, 0);
+        shaftGrad.addColorStop(0, '#fef08a');
+        shaftGrad.addColorStop(0.5, '#f7df6e');
+        shaftGrad.addColorStop(1, '#d4af37');
+
+        ctx.beginPath();
+        ctx.moveTo(pullback + 15, -2.5);
+        ctx.lineTo(pullback + stickLength * 0.65, -4.2);
+        ctx.lineTo(pullback + stickLength * 0.65, 4.2);
+        ctx.lineTo(pullback + 15, 2.5);
+        ctx.closePath();
+        ctx.fillStyle = shaftGrad;
+        ctx.fill();
+
+        // 4. Impugnatura in radica di palissandro imperiale
+        const buttGrad = ctx.createLinearGradient(pullback + stickLength * 0.65, 0, pullback + stickLength, 0);
+        buttGrad.addColorStop(0, '#361505');
+        buttGrad.addColorStop(0.3, '#1c0a03');
+        buttGrad.addColorStop(0.7, '#2a0e04');
+        buttGrad.addColorStop(1, '#110502');
+
+        ctx.beginPath();
+        ctx.moveTo(pullback + stickLength * 0.65, -4.2);
+        ctx.lineTo(pullback + stickLength, -5.6);
+        ctx.lineTo(pullback + stickLength, 5.6);
+        ctx.lineTo(pullback + stickLength * 0.65, 4.2);
+        ctx.closePath();
+        ctx.fillStyle = buttGrad;
+        ctx.fill();
+
+        // Anelli dorati neoclassici intarsiati sull'impugnatura
+        ctx.fillStyle = '#f5c542';
+        ctx.fillRect(pullback + stickLength * 0.67, -4.4, 3.5, 8.8);
+        ctx.fillRect(pullback + stickLength * 0.88, -5.0, 3.5, 10.0);
+
+        // Gommino posteriore
+        ctx.fillStyle = '#0a0a0d';
+        ctx.fillRect(pullback + stickLength, -5, 5, 10);
+
+        ctx.restore();
+      }
+
+      drawBallInHandGhost(ctx) {
+        const p = this.ballInHandPos;
+        const r = this.table.ballRadius;
+        const isValid = this.ballInHandValid;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, r + 7, 0, Math.PI * 2);
+        ctx.fillStyle = isValid ? 'rgba(34, 197, 94, 0.28)' : 'rgba(239, 68, 68, 0.35)';
+        ctx.fill();
+        ctx.strokeStyle = isValid ? '#22c55e' : '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.fill();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 11px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(isValid ? '✓' : '✗', 0, 0.5);
+
+        ctx.restore();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      window.poolGame = new PoolGame();
+    });
+  </script>
+</body>
+</html>
